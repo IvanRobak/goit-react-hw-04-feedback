@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Statistics from '../Statistics/Statistics';
+import Notification from '../Notification/Notification';
 import FeedbackOptions from '../FeedbackOptions/FeedbackOptions';
 import Section from '../Section/Section';
 import { Container } from './App.styled';
@@ -9,19 +10,24 @@ export const App = () => {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
 
-  const handleChange = e => {
-    if (e === 'Good') {
-      setGood(good + 1);
-    } else if (e === 'Neutral') {
-      setNeutral(neutral + 1);
-    } else if (e === 'Bad') {
-      setBad(bad + 1);
+  const handleChange = value => {
+    switch (value) {
+      case 'Good':
+        setGood(prevGood => prevGood + 1);
+        break;
+      case 'Neutral':
+        setNeutral(prevNeutral => prevNeutral + 1);
+        break;
+      case 'Bad':
+        setBad(prevBad => prevBad + 1);
+        break;
+      default:
+        return;
     }
   };
 
   const countTotalFeedback = () => {
-    let total = good + bad + neutral;
-    return total;
+    return good + bad + neutral;
   };
 
   const countPositiveFeedbackPercentage = () => {
@@ -31,6 +37,7 @@ export const App = () => {
     return Math.round(0 + (good / countTotalFeedback()) * 100);
   };
 
+  const total = countTotalFeedback();
   return (
     <div
       style={{
@@ -51,13 +58,17 @@ export const App = () => {
         </Section>
 
         <Section title="Statistics">
-          <Statistics
-            good={good}
-            neutral={neutral}
-            bad={bad}
-            total={countTotalFeedback()}
-            persentage={countPositiveFeedbackPercentage()}
-          />
+          {total > 0 ? (
+            <Statistics
+              good={good}
+              neutral={neutral}
+              bad={bad}
+              total={total}
+              persentage={countPositiveFeedbackPercentage()}
+            />
+          ) : (
+            <Notification message="There is no feedback" />
+          )}
         </Section>
       </Container>
     </div>
